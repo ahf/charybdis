@@ -39,6 +39,7 @@
 static SSL_CTX *ssl_server_ctx;
 static SSL_CTX *ssl_client_ctx;
 static int libratbox_index = -1;
+static char *ssl_ca_file;
 
 static unsigned long
 get_last_err(void)
@@ -356,7 +357,7 @@ rb_init_ssl(void)
 
 
 int
-rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile)
+rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile, const char *cafile)
 {
 	DH *dh;
 	unsigned long err;
@@ -386,6 +387,24 @@ rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile)
 		rb_lib_log("rb_setup_ssl_server: Error loading keyfile [%s]: %s", keyfile,
 			   get_ssl_error(err));
 		return 0;
+	}
+
+	// Calling SSL_CTX_load_verify_locations() disconnects all SSL users, even
+	// if the file remains unchanged. Therefore we will only call
+	// SSL_CTX_load_verify_locations() if the CA file path have changed.
+	if (cafile != NULL && (ssl_ca_file == NULL || strcmp(cafile, ssl_ca_file) != 0))
+	{
+		if (!SSL_CTX_load_verify_locations(ssl_server_ctx, cafile, NULL) || !SSL_CTX_load_verify_locations(ssl_server_ctx, cafile, NULL))
+		{
+			err = ERR_get_error();
+			rb_lib_log("rb_setup_ssl_server: Error loading CA file [%s]: %s", cafile, get_ssl_error(err));
+			return 0;
+		}
+
+		if (ssl_ca_file != NULL)
+			free(ssl_ca_file);
+
+		ssl_ca_file = strdup(cafile);
 	}
 
 	if(dhfile != NULL)

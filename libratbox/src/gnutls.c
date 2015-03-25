@@ -327,7 +327,7 @@ rb_load_file_into_datum_t(const char *file)
 }
 
 int
-rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile)
+rb_setup_ssl_server(const char *cert, const char *keyfile, const char *dhfile, const char *cafile)
 {
 	int ret;
 	gnutls_datum_t *d_cert, *d_key;
