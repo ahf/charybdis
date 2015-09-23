@@ -326,19 +326,6 @@ rb_init_ssl(void)
 	SSL_CTX_set_session_cache_mode(ssl_server_ctx, SSL_SESS_CACHE_OFF);
 	SSL_CTX_set_cipher_list(ssl_server_ctx, "kEECDH+HIGH:kEDH+HIGH:HIGH:!RC4:!aNULL");
 
-	/* Set ECDHE on OpenSSL 1.00+, but make sure it's actually available because redhat are dicks
-	   and bastardise their OpenSSL for stupid reasons... */
-	#if (OPENSSL_VERSION_NUMBER >= 0x10000000) && defined(NID_secp384r1)
-		EC_KEY *key = EC_KEY_new_by_curve_name(NID_secp384r1);
-		if (key) {
-			SSL_CTX_set_tmp_ecdh(ssl_server_ctx, key);
-			EC_KEY_free(key);
-		}
-#ifdef SSL_OP_SINGLE_ECDH_USE
-		SSL_CTX_set_options(ssl_server_ctx, SSL_OP_SINGLE_ECDH_USE);
-#endif
-	#endif
-
 	ssl_client_ctx = SSL_CTX_new(TLSv1_client_method());
 
 	if(ssl_client_ctx == NULL)
