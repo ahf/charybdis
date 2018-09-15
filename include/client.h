@@ -432,6 +432,7 @@ struct ListClient
 #define FLAGS_EXEMPTSPAMBOT	0x02000000
 #define FLAGS_EXEMPTSHIDE	0x04000000
 #define FLAGS_EXEMPTJUPE	0x08000000
+#define FLAGS_SENTONIONPROXY	0x10000000
 
 
 /* flags for local clients, this needs stuff moved from above to here at some point */
@@ -439,6 +440,7 @@ struct ListClient
 #define LFLAGS_FLUSH		0x00000002
 #define LFLAGS_CORK		0x00000004
 #define LFLAGS_SCTP		0x00000008
+#define LFLAGS_ONION		0x00000010
 
 /* umodes, settable flags */
 /* lots of this moved to snomask -- jilles */
@@ -512,6 +514,10 @@ struct ListClient
 #define IsSCTP(x)		((x)->localClient->localflags & LFLAGS_SCTP)
 #define SetSCTP(x)		((x)->localClient->localflags |= LFLAGS_SCTP)
 #define ClearSCTP(x)		((x)->localClient->localflags &= ~LFLAGS_SCTP)
+
+#define IsOnion(x)		((x)->localClient->localflags & LFLAGS_ONION)
+#define SetOnion(x)		((x)->localClient->localflags |= LFLAGS_ONION)
+#define ClearOnion(x)		((x)->localClient->localflags &= ~LFLAGS_ONION)
 
 /* oper flags */
 #define MyOper(x)               (MyConnect(x) && IsOper(x))
